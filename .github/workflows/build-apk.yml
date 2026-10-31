@@ -1,0 +1,220 @@
+name: Build APK
+
+on:
+  push:
+    branches: [main, master]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Tulis aplikasi catatan
+        run: |
+          mkdir -p www
+          cat > www/index.html <<'APPHTML_END'
+          <!DOCTYPE html>
+          <html lang="id"><head><meta charset="utf-8">
+          <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+          <title>Catatan</title>
+          <style>
+          :root{--bg:#e9edf3;--cd:#fbfcff;--fg:#1f2a3d;--mu:#7a869a;--ac:#2b4a8b;--ln:#c5d5ec;--nc:#9aa0a6}
+          [data-t=d]{--bg:#0f1217;--cd:#181d26;--fg:#dfe6f2;--mu:#8793a8;--ac:#8fb0f0;--ln:#2c3a52}
+          *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+          html,body{height:100%;margin:0;overflow:hidden}
+          body{background:var(--bg);color:var(--fg);font:16px/1.4 system-ui,-apple-system,Roboto,"Segoe UI",sans-serif;padding-top:env(safe-area-inset-top,0)}
+          [hidden]{display:none!important}
+          .v{height:100%;display:flex;flex-direction:column}
+          header{display:flex;align-items:center;gap:6px;padding:10px 12px}
+          header h1{flex:1;margin:0;font-size:24px}
+          button{font:inherit;color:inherit;background:none;border:0;border-radius:10px;padding:8px 10px}
+          .ic{font-size:18px;background:var(--cd);border:1px solid var(--ln);min-width:40px}
+          #q{margin:0 12px 8px;padding:10px 14px;border-radius:12px;border:1px solid var(--ln);background:var(--cd);color:var(--fg);font:inherit}
+          #list{flex:1;overflow:auto;padding:4px 12px 96px;display:grid;gap:10px;align-content:start}
+          .card{background:var(--cd);border:1px solid var(--ln);border-left:6px solid;border-radius:6px 12px 12px 6px;padding:12px 14px}
+          .card p{margin:4px 0;color:var(--mu);font-size:14px;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+          .card small{color:var(--mu)}
+          .em{text-align:center;color:var(--mu);margin-top:60px}
+          #add{position:fixed;right:18px;bottom:calc(18px + env(safe-area-inset-bottom,0px));width:58px;height:58px;border-radius:50%;background:var(--ac);color:var(--cd);font-size:32px;padding:0;box-shadow:0 4px 14px #0004}
+          #E header{border-bottom:3px solid var(--nc)}
+          #ed{flex:1;overflow:auto;padding:8px 14px 24px;background:var(--cd)}
+          textarea,#ti{width:100%;border:0;outline:0;background:none;color:var(--fg);font:inherit;resize:none;overflow:hidden;padding:0;line-height:28px;display:block}
+          #ti{font-size:24px;font-weight:700;line-height:1.3;margin:6px 0 10px}
+          .b{display:flex;gap:10px;min-height:28px}
+          .b textarea{flex:1;min-width:0}
+          .b.f{box-shadow:-4px 0 0 var(--nc)}
+          .ln #blocks{border-left:2px solid #e5737399;padding-left:12px}
+          .ln .b{margin-left:-12px;padding-left:12px;background:repeating-linear-gradient(transparent 0 27px,var(--ln) 27px 28px)}
+          .gr .b{background:linear-gradient(var(--ln) 1px,transparent 1px) 0 0/28px 28px,linear-gradient(90deg,var(--ln) 1px,transparent 1px) 0 0/28px 28px}
+          .dt .b{background:radial-gradient(var(--ln) 1.3px,transparent 1.6px) 0 0/28px 28px}
+          .b-h textarea{font-size:20px;font-weight:700}
+          .b input[type=checkbox]{width:20px;height:20px;margin:4px 0 0;accent-color:var(--ac);flex:none}
+          .done textarea{text-decoration:line-through;color:var(--mu)}
+          .b i{font-style:normal;width:20px;text-align:center;line-height:28px;flex:none}
+          .b-hr{align-items:center}
+          hr{flex:1;border:0;border-top:2px solid var(--mu);opacity:.5;margin:0}
+          .b-k textarea+textarea{border-left:2px solid var(--ln);padding-left:10px}
+          .b-t,.ln .b-t{display:block;background:none;margin:6px 0;padding:0}
+          .tw{overflow-x:auto}
+          table{border-collapse:collapse;width:100%}
+          td{border:1px solid var(--ln);min-width:96px;padding:2px 6px;vertical-align:top}
+          td textarea{line-height:22px}
+          tr:first-child textarea{font-weight:700}
+          .tt{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+          .tt button{font-size:13px;padding:4px 8px;border:1px solid var(--ln)}
+          #bar{display:flex;align-items:center;border-top:1px solid var(--ln);background:var(--bg);padding:6px 6px calc(6px + env(safe-area-inset-bottom,0px))}
+          #add2{flex:1;display:flex;gap:4px;overflow-x:auto}
+          #mv{display:flex;gap:4px;margin-left:6px;padding-left:6px;border-left:1px solid var(--ln)}
+          #bar button{white-space:nowrap;font-size:14px;border:1px solid var(--ln);background:var(--cd)}
+          #to{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:#000c;color:#fff;padding:8px 14px;border-radius:20px;font-size:14px;opacity:0;transition:opacity .2s;pointer-events:none}
+          #to.s{opacity:1}
+          </style></head><body>
+          <div class="v" id="L">
+           <header><h1>Catatan</h1><button class="ic" id="th">🌓</button></header>
+           <input id="q" placeholder="Cari catatan...">
+           <div id="list"></div>
+           <button id="add">+</button>
+          </div>
+          <div class="v" id="E" hidden>
+           <header><button class="ic" id="bk">‹</button><span style="flex:1"></span><button class="ic" id="pin">📌</button><button class="ic" id="pp">📄</button><button class="ic" id="co">🎨</button><button class="ic" id="del">🗑</button></header>
+           <div id="ed"><input id="ti" placeholder="Judul"><div id="blocks"></div></div>
+           <div id="bar">
+            <div id="add2"><button data-t="p">Teks</button><button data-t="h">Judul</button><button data-t="c">☑ Ceklis</button><button data-t="b">• Poin</button><button data-t="hr">─ Garis</button><button data-t="k">▥ Kolom</button><button data-t="t">▦ Tabel</button></div>
+            <div id="mv"><button data-m="-1">↑</button><button data-m="1">↓</button><button data-m="0">✕</button></div>
+           </div>
+          </div>
+          <div id="to"></div>
+          <script>
+          const $=s=>document.querySelector(s),B=$('#blocks');
+          const ls=(k,v)=>{try{if(v===undefined)return localStorage.getItem(k);localStorage.setItem(k,v)}catch(e){}};
+          let N=[],cur=null,foc=-1,q='';
+          try{N=JSON.parse(ls('n')||'[]')}catch(e){}
+          const save=()=>ls('n',JSON.stringify(N));
+          const touch=()=>{cur.u=Date.now();save()};
+          const esc=s=>(s||'').replace(/[&<>"]/g,c=>'&#'+c.charCodeAt(0)+';');
+          const COL=['#9aa0a6','#e57373','#f2b84b','#6fbf73','#5aa9e6','#a67fd6'];
+          const PP=['pl','ln','gr','dt'],PN=['Polos','Bergaris','Kotak','Titik'];
+          const TX=['p','h','c','b'];
+          const mk=t=>t=='t'?{t,r:[['','',''],['','','']]}:{t,x:'',y:'',d:false};
+          const toast=m=>{const t=$('#to');t.textContent=m;t.classList.add('s');clearTimeout(t.k);t.k=setTimeout(()=>t.classList.remove('s'),1300)};
+          const dk=t=>document.documentElement.dataset.t=t;
+          dk(ls('th')||(matchMedia('(prefers-color-scheme:dark)').matches?'d':'l'));
+          $('#th').onclick=()=>{const t=document.documentElement.dataset.t=='d'?'l':'d';dk(t);ls('th',t)};
+
+          function list(){
+           const f=N.filter(n=>(n.title+' '+n.b.map(b=>[b.x,b.y,b.r].join(' ')).join(' ')).toLowerCase().includes(q)).sort((a,b)=>(b.p|0)-(a.p|0)||b.u-a.u);
+           $('#list').innerHTML=f.map(n=>{const c=n.b.filter(b=>b.t=='c');
+            return `<div class="card" data-id="${n.id}" style="border-left-color:${COL[n.c]}"><b>${n.p?'📌 ':''}${esc(n.title)||'Tanpa judul'}</b><p>${esc(n.b.map(b=>b.x||'').join(' ').trim())||'(kosong)'}</p><small>${c.length?'☑ '+c.filter(b=>b.d).length+'/'+c.length+' · ':''}${new Date(n.u).toLocaleDateString('id-ID')}</small></div>`}).join('')||'<p class="em">Belum ada catatan.<br>Tekan + untuk mulai.</p>';
+          }
+          $('#list').onclick=e=>{const c=e.target.closest('.card');if(c)location.hash='n/'+c.dataset.id};
+          $('#q').oninput=e=>{q=e.target.value.toLowerCase();list()};
+          $('#add').onclick=()=>{const n={id:Math.random().toString(36).slice(2,9),title:'',c:0,pp:'ln',p:false,u:Date.now(),b:[mk('p')]};N.unshift(n);save();location.hash='n/'+n.id};
+
+          function blk(b,i){
+           const x=(k,v,ph)=>`<textarea rows="1" data-k="${k}" placeholder="${ph}">${esc(v)}</textarea>`;
+           let h;
+           if(b.t=='h')h=x('x',b.x,'Judul bagian');
+           else if(b.t=='c')h=`<input type="checkbox" ${b.d?'checked':''}>`+x('x',b.x,'Tugas');
+           else if(b.t=='b')h='<i>•</i>'+x('x',b.x,'Poin');
+           else if(b.t=='hr')h='<hr>';
+           else if(b.t=='k')h=x('x',b.x,'Kolom 1')+x('y',b.y,'Kolom 2');
+           else if(b.t=='t')h='<div class="tw"><table>'+b.r.map((r,ri)=>'<tr>'+r.map((c,ci)=>`<td><textarea rows="1" data-r="${ri}" data-c="${ci}">${esc(c)}</textarea></td>`).join('')+'</tr>').join('')+'</table></div><div class="tt"><button data-a="ar">+ baris</button><button data-a="ac">+ kolom</button><button data-a="dr">− baris</button><button data-a="dc">− kolom</button></div>';
+           else h=x('x',b.x,'Tulis sesuatu...');
+           return `<div class="b b-${b.t}${b.d?' done':''}" data-i="${i}">${h}</div>`;
+          }
+          const sz=()=>document.querySelectorAll('#blocks textarea').forEach(t=>{t.style.height='auto';t.style.height=t.scrollHeight+'px'});
+          function ed(){
+           $('#E').style.setProperty('--nc',COL[cur.c]);
+           $('#ed').className=cur.pp;
+           $('#ti').value=cur.title;
+           $('#pin').style.opacity=cur.p?1:.45;
+           B.innerHTML=cur.b.map(blk).join('');
+           sz();
+          }
+          const mark=el=>{foc=+el.dataset.i;B.querySelectorAll('.f').forEach(x=>x.classList.remove('f'));el.classList.add('f')};
+          function fx(i){const el=B.children[i];if(!el)return;mark(el);const t=el.querySelector('textarea');if(t){t.focus();t.setSelectionRange(t.value.length,t.value.length)}}
+          function ins(i,t){cur.b.splice(i,0,mk(t));touch();ed();fx(i)}
+
+          B.addEventListener('input',e=>{
+           const t=e.target,el=t.closest('.b');if(!el||t.tagName!='TEXTAREA')return;
+           const i=+el.dataset.i,b=cur.b[i];
+           if(t.dataset.r!==undefined)b.r[t.dataset.r][t.dataset.c]=t.value;
+           else{
+            if(/insert(LineBreak|Paragraph)/.test(e.inputType||'')&&'hcb'.includes(b.t)&&t.dataset.k=='x'){
+             b.x=t.value.replace(/\n/g,'');
+             if(!b.x&&b.t!='h'){b.t='p';touch();ed();fx(i)}else ins(i+1,b.t=='h'?'p':b.t);
+             return}
+            b[t.dataset.k]=t.value}
+           t.style.height='auto';t.style.height=t.scrollHeight+'px';touch();
+          });
+          B.addEventListener('change',e=>{if(e.target.type=='checkbox'){const el=e.target.closest('.b');cur.b[el.dataset.i].d=e.target.checked;el.classList.toggle('done',e.target.checked);touch()}});
+          B.addEventListener('focusin',e=>{const el=e.target.closest('.b');if(el)mark(el)});
+          B.addEventListener('click',e=>{
+           const el=e.target.closest('.b');if(!el)return;mark(el);
+           const a=e.target.dataset.a;if(!a)return;
+           const r=cur.b[el.dataset.i].r;
+           if(a=='ar')r.push(r[0].map(()=>''));
+           if(a=='ac')r.forEach(x=>x.push(''));
+           if(a=='dr'&&r.length>1)r.pop();
+           if(a=='dc'&&r[0].length>1)r.forEach(x=>x.pop());
+           touch();ed();fx(foc);
+          });
+          $('#add2').onclick=e=>{
+           const t=e.target.dataset.t;if(!t)return;
+           const f=cur.b[foc];
+           if(f&&TX.includes(f.t)&&!f.x&&TX.includes(t)){f.t=t;touch();ed();fx(foc);return}
+           ins(foc<0?cur.b.length:foc+1,t);
+          };
+          $('#mv').onclick=e=>{
+           const m=e.target.dataset.m,b=cur.b;if(m===undefined)return;
+           if(foc<0||!b[foc])return toast('Ketuk sebuah blok dulu');
+           if(m=='0'){b.splice(foc,1);if(!b.length)b.push(mk('p'));foc=Math.min(foc,b.length-1)}
+           else{const j=foc+ +m;if(j<0||j>=b.length)return;[b[foc],b[j]]=[b[j],b[foc]];foc=j}
+           touch();ed();fx(foc);
+          };
+          $('#ti').oninput=e=>{cur.title=e.target.value;touch()};
+          $('#bk').onclick=()=>history.back();
+          $('#pin').onclick=()=>{cur.p=!cur.p;touch();ed();toast(cur.p?'Catatan disematkan':'Sematan dilepas')};
+          $('#pp').onclick=()=>{const i=(PP.indexOf(cur.pp)+1)%PP.length;cur.pp=PP[i];touch();ed();toast('Kertas: '+PN[i])};
+          $('#co').onclick=()=>{cur.c=(cur.c+1)%COL.length;touch();ed()};
+          $('#del').onclick=()=>{if(confirm('Hapus catatan ini?')){N=N.filter(n=>n!==cur);save();history.back()}};
+
+          function route(){
+           const m=location.hash.match(/^#n\/(\w+)/);
+           cur=m?N.find(n=>n.id==m[1])||null:null;
+           $('#L').hidden=!!cur;$('#E').hidden=!cur;
+           if(cur){ed();foc=-1;if(!cur.title&&cur.b.length==1&&!cur.b[0].x)fx(0)}
+           else{N=N.filter(k=>k.title||k.b.some(b=>b.x||b.y||b.t=='hr'||b.t=='t'));save();list()}
+          }
+          addEventListener('hashchange',route);addEventListener('resize',sz);route();
+          </script></body></html>
+          APPHTML_END
+
+      - name: Siapkan proyek Android
+        run: |
+          echo '{"name":"catatan","version":"1.0.0"}' > package.json
+          npm i @capacitor/core@6 @capacitor/cli@6 @capacitor/android@6 --no-audit --no-fund
+          npx cap init Catatan com.catatan.app --web-dir=www
+          npx cap add android
+          npx cap sync android
+
+      - name: Build APK
+        working-directory: android
+        run: |
+          chmod +x gradlew
+          ./gradlew assembleDebug
+
+      - name: Unggah APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: catatan-apk
+          path: android/app/build/outputs/apk/debug/app-debug.apk
