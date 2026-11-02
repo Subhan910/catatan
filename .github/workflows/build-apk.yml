@@ -30,8 +30,8 @@ jobs:
           <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
           <title>Catatan</title>
           <style>
-          :root{--bg:#e9edf3;--cd:#fbfcff;--fg:#1f2a3d;--mu:#7a869a;--ac:#2b4a8b;--ln:#c5d5ec;--nc:#9aa0a6;--wp:#d98a00}
-          [data-t=d]{--bg:#0f1217;--cd:#181d26;--fg:#dfe6f2;--mu:#8793a8;--ac:#8fb0f0;--ln:#2c3a52;--wp:#f2b84b}
+          :root{--bg:#e9edf3;--cd:#fbfcff;--fg:#1f2a3d;--mu:#7a869a;--ac:#2b4a8b;--ln:#c5d5ec;--nc:#9aa0a6}
+          [data-t=d]{--bg:#0f1217;--cd:#181d26;--fg:#dfe6f2;--mu:#8793a8;--ac:#8fb0f0;--ln:#2c3a52}
           *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
           html,body{height:100%;margin:0;overflow:hidden}
           body{background:var(--bg);color:var(--fg);font:16px/1.4 system-ui,-apple-system,Roboto,"Segoe UI",sans-serif;padding-top:env(safe-area-inset-top,0)}
@@ -60,12 +60,16 @@ jobs:
           .gr .b{background:linear-gradient(var(--ln) 1px,transparent 1px) 0 0/28px 28px,linear-gradient(90deg,var(--ln) 1px,transparent 1px) 0 0/28px 28px}
           .dt .b{background:radial-gradient(var(--ln) 1.3px,transparent 1.6px) 0 0/28px 28px}
           .b-h textarea{font-size:20px;font-weight:700}
-          .ck{width:22px;height:22px;margin:3px 0 0;padding:0;flex:none;border:2px solid var(--mu);border-radius:6px;background:var(--cd);color:var(--cd);font-size:14px;font-weight:700;line-height:1;display:flex;align-items:center;justify-content:center}
-          .ck[data-s="1"]{border-color:var(--wp);background:linear-gradient(90deg,var(--wp) 50%,var(--cd) 50%)}
-          .ck[data-s="2"]{border-color:var(--ac);background:var(--ac)}
-          .ck[data-s="2"]::after{content:"✓"}
+          .st{width:22px;height:22px;margin:3px 0 0;padding:0;flex:none;border:2px solid var(--mu);border-radius:6px;background:none;display:grid;place-items:center;font-size:14px;font-weight:700;line-height:1}
+          .s1 .st{border-color:#e8a317;background:linear-gradient(90deg,#e8a317 50%,transparent 50%)}
+          .s2 .st{border-color:var(--ac);background:var(--ac);color:var(--cd)}
+          .s2 .st::after{content:"✓"}
           .s2 textarea{text-decoration:line-through;color:var(--mu)}
-          .b-c.s1::after{content:"Proses";align-self:flex-start;margin-top:4px;font-size:11px;line-height:18px;padding:0 8px;border-radius:9px;border:1px solid var(--wp);color:var(--wp);flex:none}
+          .s1 textarea{font-weight:600}
+          .s1::after,.s2::after{flex:none;align-self:flex-start;margin-top:5px;font-size:11px;line-height:18px;padding:0 8px;border-radius:9px;font-weight:600}
+          .s1::after{content:"Dikerjakan";background:#e8a317;color:#1f2a3d}
+          .s2::after{content:"Selesai";background:var(--ac);color:var(--cd)}
+          #sm{font-size:13px;color:var(--mu);margin:-4px 0 10px}
           .b i{font-style:normal;width:20px;text-align:center;line-height:28px;flex:none}
           .b-hr{align-items:center}
           hr{flex:1;border:0;border-top:2px solid var(--mu);opacity:.5;margin:0}
@@ -93,7 +97,7 @@ jobs:
           </div>
           <div class="v" id="E" hidden>
            <header><button class="ic" id="bk">‹</button><span style="flex:1"></span><button class="ic" id="pin">📌</button><button class="ic" id="pp">📄</button><button class="ic" id="co">🎨</button><button class="ic" id="del">🗑</button></header>
-           <div id="ed"><input id="ti" placeholder="Judul"><div id="blocks"></div></div>
+           <div id="ed"><input id="ti" placeholder="Judul"><div id="sm"></div><div id="blocks"></div></div>
            <div id="bar">
             <div id="add2"><button data-t="p">Teks</button><button data-t="h">Judul</button><button data-t="c">☑ Ceklis</button><button data-t="b">• Poin</button><button data-t="hr">─ Garis</button><button data-t="k">▥ Kolom</button><button data-t="t">▦ Tabel</button></div>
             <div id="mv"><button data-m="-1">↑</button><button data-m="1">↓</button><button data-m="0">✕</button></div>
@@ -105,15 +109,14 @@ jobs:
           const ls=(k,v)=>{try{if(v===undefined)return localStorage.getItem(k);localStorage.setItem(k,v)}catch(e){}};
           let N=[],cur=null,foc=-1,q='';
           try{N=JSON.parse(ls('n')||'[]')}catch(e){}
+          N.forEach(n=>n.b.forEach(b=>{if(b.t=='c'&&b.s===undefined)b.s=b.d?2:0}));
           const save=()=>ls('n',JSON.stringify(N));
           const touch=()=>{cur.u=Date.now();save()};
           const esc=s=>(s||'').replace(/[&<>"]/g,c=>'&#'+c.charCodeAt(0)+';');
           const COL=['#9aa0a6','#e57373','#f2b84b','#6fbf73','#5aa9e6','#a67fd6'];
           const PP=['pl','ln','gr','dt'],PN=['Polos','Bergaris','Kotak','Titik'];
           const TX=['p','h','c','b'];
-          const st=b=>b.s==null?(b.d?2:0):b.s;
-          const SN=['Belum dikerjakan','Sedang diproses','Selesai dikerjakan'];
-          const mk=t=>t=='t'?{t,r:[['','',''],['','','']]}:{t,x:'',y:'',d:false,s:0};
+          const mk=t=>t=='t'?{t,r:[['','',''],['','','']]}:{t,x:'',y:'',s:0};
           const toast=m=>{const t=$('#to');t.textContent=m;t.classList.add('s');clearTimeout(t.k);t.k=setTimeout(()=>t.classList.remove('s'),1300)};
           const dk=t=>document.documentElement.dataset.t=t;
           dk(ls('th')||(matchMedia('(prefers-color-scheme:dark)').matches?'d':'l'));
@@ -122,7 +125,7 @@ jobs:
           function list(){
            const f=N.filter(n=>(n.title+' '+n.b.map(b=>[b.x,b.y,b.r].join(' ')).join(' ')).toLowerCase().includes(q)).sort((a,b)=>(b.p|0)-(a.p|0)||b.u-a.u);
            $('#list').innerHTML=f.map(n=>{const c=n.b.filter(b=>b.t=='c');
-            return `<div class="card" data-id="${n.id}" style="border-left-color:${COL[n.c]}"><b>${n.p?'📌 ':''}${esc(n.title)||'Tanpa judul'}</b><p>${esc(n.b.map(b=>b.x||'').join(' ').trim())||'(kosong)'}</p><small>${c.length?'☑ '+c.filter(b=>st(b)==2).length+'/'+c.length+(c.some(b=>st(b)==1)?' · ◐ '+c.filter(b=>st(b)==1).length+' proses':'')+' · ':''}${new Date(n.u).toLocaleDateString('id-ID')}</small></div>`}).join('')||'<p class="em">Belum ada catatan.<br>Tekan + untuk mulai.</p>';
+            return `<div class="card" data-id="${n.id}" style="border-left-color:${COL[n.c]}"><b>${n.p?'📌 ':''}${esc(n.title)||'Tanpa judul'}</b><p>${esc(n.b.map(b=>b.x||'').join(' ').trim())||'(kosong)'}</p><small>${c.length?'☑ '+c.filter(b=>b.s==2).length+'/'+c.length+(c.some(b=>b.s==1)?' · ◐ '+c.filter(b=>b.s==1).length+' dikerjakan':'')+' · ':''}${new Date(n.u).toLocaleDateString('id-ID')}</small></div>`}).join('')||'<p class="em">Belum ada catatan.<br>Tekan + untuk mulai.</p>';
           }
           $('#list').onclick=e=>{const c=e.target.closest('.card');if(c)location.hash='n/'+c.dataset.id};
           $('#q').oninput=e=>{q=e.target.value.toLowerCase();list()};
@@ -132,13 +135,13 @@ jobs:
            const x=(k,v,ph)=>`<textarea rows="1" data-k="${k}" placeholder="${ph}">${esc(v)}</textarea>`;
            let h;
            if(b.t=='h')h=x('x',b.x,'Judul bagian');
-           else if(b.t=='c')h=`<button class="ck" data-s="${st(b)}" aria-label="Ubah status"></button>`+x('x',b.x,'Tugas');
+           else if(b.t=='c')h='<button class="st"></button>'+x('x',b.x,'Tugas');
            else if(b.t=='b')h='<i>•</i>'+x('x',b.x,'Poin');
            else if(b.t=='hr')h='<hr>';
            else if(b.t=='k')h=x('x',b.x,'Kolom 1')+x('y',b.y,'Kolom 2');
            else if(b.t=='t')h='<div class="tw"><table>'+b.r.map((r,ri)=>'<tr>'+r.map((c,ci)=>`<td><textarea rows="1" data-r="${ri}" data-c="${ci}">${esc(c)}</textarea></td>`).join('')+'</tr>').join('')+'</table></div><div class="tt"><button data-a="ar">+ baris</button><button data-a="ac">+ kolom</button><button data-a="dr">− baris</button><button data-a="dc">− kolom</button></div>';
            else h=x('x',b.x,'Tulis sesuatu...');
-           return `<div class="b b-${b.t}${b.t=='c'?' s'+st(b):''}" data-i="${i}">${h}</div>`;
+           return `<div class="b b-${b.t}${b.t=='c'?' s'+(b.s|0):''}" data-i="${i}">${h}</div>`;
           }
           const sz=()=>document.querySelectorAll('#blocks textarea').forEach(t=>{t.style.height='auto';t.style.height=t.scrollHeight+'px'});
           function ed(){
@@ -147,8 +150,9 @@ jobs:
            $('#ti').value=cur.title;
            $('#pin').style.opacity=cur.p?1:.45;
            B.innerHTML=cur.b.map(blk).join('');
-           sz();
+           sz();sum();
           }
+          const sum=()=>{const c=cur.b.filter(b=>b.t=='c'),n=s=>c.filter(b=>(b.s|0)==s).length;$('#sm').textContent=c.length?`☑ ${n(2)} selesai · ◐ ${n(1)} dikerjakan · ☐ ${n(0)} belum`:''};
           const mark=el=>{foc=+el.dataset.i;B.querySelectorAll('.f').forEach(x=>x.classList.remove('f'));el.classList.add('f')};
           function fx(i){const el=B.children[i];if(!el)return;mark(el);const t=el.querySelector('textarea');if(t){t.focus();t.setSelectionRange(t.value.length,t.value.length)}}
           function ins(i,t){cur.b.splice(i,0,mk(t));touch();ed();fx(i)}
@@ -168,8 +172,7 @@ jobs:
           B.addEventListener('focusin',e=>{const el=e.target.closest('.b');if(el)mark(el)});
           B.addEventListener('click',e=>{
            const el=e.target.closest('.b');if(!el)return;mark(el);
-           const ck=e.target.closest('.ck');
-           if(ck){const b=cur.b[el.dataset.i],n=(st(b)+1)%3;b.s=n;b.d=n==2;ck.dataset.s=n;el.classList.remove('s0','s1','s2');el.classList.add('s'+n);touch();toast(SN[n]);return}
+           if(e.target.closest('.st')){const b=cur.b[el.dataset.i];b.s=((b.s|0)+1)%3;el.classList.remove('s0','s1','s2');el.classList.add('s'+b.s);touch();sum();return toast(['Belum dikerjakan','Sedang dikerjakan','Selesai'][b.s])}
            const a=e.target.dataset.a;if(!a)return;
            const r=cur.b[el.dataset.i].r;
            if(a=='ar')r.push(r[0].map(()=>''));
@@ -216,6 +219,11 @@ jobs:
           npx cap init Catatan com.catatan.app --web-dir=www
           npx cap add android
           npx cap sync android
+
+      - name: Pakai kunci tanda tangan tetap
+        run: |
+          mkdir -p ~/.android
+          echo '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' | base64 -d > ~/.android/debug.keystore
 
       - name: Build APK
         working-directory: android
