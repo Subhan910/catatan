@@ -90,13 +90,13 @@ jobs:
           #to.s{opacity:1}
           </style></head><body>
           <div class="v" id="L">
-           <header><h1>Catatan</h1><button class="ic" id="th">🌓</button></header>
+           <header><h1>Catatan</h1><button class="ic" id="all">📋</button><button class="ic" id="bu">💾</button><button class="ic" id="rs">📥</button><button class="ic" id="th">🌓</button></header>
            <input id="q" placeholder="Cari catatan...">
            <div id="list"></div>
            <button id="add">+</button>
           </div>
           <div class="v" id="E" hidden>
-           <header><button class="ic" id="bk">‹</button><span style="flex:1"></span><button class="ic" id="pin">📌</button><button class="ic" id="pp">📄</button><button class="ic" id="co">🎨</button><button class="ic" id="del">🗑</button></header>
+           <header><button class="ic" id="bk">‹</button><span style="flex:1"></span><button class="ic" id="cp">📋</button><button class="ic" id="pin">📌</button><button class="ic" id="pp">📄</button><button class="ic" id="co">🎨</button><button class="ic" id="del">🗑</button></header>
            <div id="ed"><input id="ti" placeholder="Judul"><div id="sm"></div><div id="blocks"></div></div>
            <div id="bar">
             <div id="add2"><button data-t="p">Teks</button><button data-t="h">Judul</button><button data-t="c">☑ Ceklis</button><button data-t="b">• Poin</button><button data-t="hr">─ Garis</button><button data-t="k">▥ Kolom</button><button data-t="t">▦ Tabel</button></div>
@@ -118,8 +118,15 @@ jobs:
           const TX=['p','h','c','b'];
           const mk=t=>t=='t'?{t,r:[['','',''],['','','']]}:{t,x:'',y:'',s:0};
           const toast=m=>{const t=$('#to');t.textContent=m;t.classList.add('s');clearTimeout(t.k);t.k=setTimeout(()=>t.classList.remove('s'),1300)};
+          const txt=n=>n.title+'\n\n'+n.b.map(b=>b.t=='c'?['[ ] ','[~] ','[x] '][b.s|0]+b.x:b.t=='b'?'• '+b.x:b.t=='h'?'# '+b.x:b.t=='hr'?'────────':b.t=='k'?b.x+' | '+b.y:b.t=='t'?b.r.map(r=>r.join(' | ')).join('\n'):b.x).join('\n');
+          const copy=async(s,m)=>{let ok=1;try{await navigator.clipboard.writeText(s)}catch(e){const t=document.createElement('textarea');t.value=s;t.style.cssText='position:fixed;opacity:0';document.body.appendChild(t);t.select();try{ok=document.execCommand('copy')}catch(e){ok=0}t.remove()}toast(ok?m:'Gagal menyalin')};
           const dk=t=>document.documentElement.dataset.t=t;
           dk(ls('th')||(matchMedia('(prefers-color-scheme:dark)').matches?'d':'l'));
+          $('#all').onclick=()=>N.length?copy(N.map(txt).join('\n\n=========\n\n'),N.length+' catatan disalin'):toast('Belum ada catatan');
+          $('#bu').onclick=()=>copy(JSON.stringify(N),'Cadangan disalin');
+          $('#rs').onclick=()=>{const s=prompt('Tempel cadangan (JSON) di sini:');if(!s)return;
+           try{const a=JSON.parse(s),ids=new Set(N.map(n=>n.id));if(!Array.isArray(a))throw 0;a.forEach(n=>{if(n&&n.id&&Array.isArray(n.b)&&!ids.has(n.id))N.push(n)});save();list();toast('Cadangan dipulihkan')}catch(e){toast('Format tidak valid')}};
+          $('#cp').onclick=()=>copy(txt(cur),'Catatan disalin');
           $('#th').onclick=()=>{const t=document.documentElement.dataset.t=='d'?'l':'d';dk(t);ls('th',t)};
 
           function list(){
@@ -216,7 +223,7 @@ jobs:
         run: |
           echo '{"name":"catatan","version":"1.0.0"}' > package.json
           npm i @capacitor/core@6 @capacitor/cli@6 @capacitor/android@6 --no-audit --no-fund
-          npx cap init Catatan com.catatan.app --web-dir=www
+          npx cap init "Catatan Baru" com.catatan.baru --web-dir=www
           npx cap add android
           npx cap sync android
 
