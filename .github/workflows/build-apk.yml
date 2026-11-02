@@ -48,7 +48,11 @@ jobs:
           .card small{color:var(--mu)}
           .em{text-align:center;color:var(--mu);margin-top:60px}
           #add{position:fixed;right:18px;bottom:calc(18px + env(safe-area-inset-bottom,0px));width:58px;height:58px;border-radius:50%;background:var(--ac);color:var(--cd);font-size:32px;padding:0;box-shadow:0 4px 14px #0004}
-          #E header{border-bottom:3px solid var(--nc)}
+          #E header{border-bottom:3px solid var(--nc);gap:4px}
+          .lk textarea,.lk #ti{pointer-events:none}
+          .lk #bar,.lk #pin,.lk #pp,.lk #co,.lk #del,.lk .tt{display:none}
+          #lb{display:none;font-size:13px;color:var(--ac);margin:0 0 6px}
+          .lk #lb{display:block}
           #ed{flex:1;overflow:auto;padding:8px 14px 24px;background:var(--cd)}
           textarea,#ti{width:100%;border:0;outline:0;background:none;color:var(--fg);font:inherit;resize:none;overflow:hidden;padding:0;line-height:28px;display:block}
           #ti{font-size:24px;font-weight:700;line-height:1.3;margin:6px 0 10px}
@@ -60,6 +64,9 @@ jobs:
           .gr .b{background:linear-gradient(var(--ln) 1px,transparent 1px) 0 0/28px 28px,linear-gradient(90deg,var(--ln) 1px,transparent 1px) 0 0/28px 28px}
           .dt .b{background:radial-gradient(var(--ln) 1.3px,transparent 1.6px) 0 0/28px 28px}
           .b-h textarea{font-size:20px;font-weight:700}
+          .hc{box-shadow:inset 4px 0 0 var(--bc)}
+          .hc.f{box-shadow:inset 4px 0 0 var(--bc),-4px 0 0 var(--nc)}
+          .hc textarea{color:var(--bc);font-weight:600}
           .st{width:22px;height:22px;margin:3px 0 0;padding:0;flex:none;border:2px solid var(--mu);border-radius:6px;background:none;display:grid;place-items:center;font-size:14px;font-weight:700;line-height:1}
           .s1 .st{border-color:#e8a317;background:linear-gradient(90deg,#e8a317 50%,transparent 50%)}
           .s2 .st{border-color:var(--ac);background:var(--ac);color:var(--cd)}
@@ -69,7 +76,18 @@ jobs:
           .s1::after,.s2::after{flex:none;align-self:flex-start;margin-top:5px;font-size:11px;line-height:18px;padding:0 8px;border-radius:9px;font-weight:600}
           .s1::after{content:"Dikerjakan";background:#e8a317;color:#1f2a3d}
           .s2::after{content:"Selesai";background:var(--ac);color:var(--cd)}
-          #sm{font-size:13px;color:var(--mu);margin:-4px 0 10px}
+          #sm{font-size:13px;color:var(--mu);margin:-4px 0 6px}
+          #pg{height:6px;border-radius:3px;background:var(--ln);margin:0 0 10px;overflow:hidden}
+          #pg i{display:block;height:100%;background:var(--ac);transition:width .3s}
+          #fl{display:flex;gap:6px;margin:0 0 10px;flex-wrap:wrap}
+          #fl button{font-size:13px;padding:4px 12px;border:1px solid var(--ln);border-radius:14px}
+          #fl button.on{background:var(--ac);color:var(--cd);border-color:var(--ac)}
+          .f1 .s2,.f2 .s2,.f2 .b-c:not(.hc){display:none}
+          .br textarea{pointer-events:none}
+          #br.on{background:var(--ac);color:var(--cd)}
+          #pal{position:fixed;left:10px;right:10px;bottom:calc(66px + env(safe-area-inset-bottom,0px));display:flex;gap:10px;justify-content:center;padding:10px;background:var(--cd);border:1px solid var(--ln);border-radius:16px;box-shadow:0 6px 20px #0006}
+          #pal button{width:38px;height:38px;border-radius:50%;border:2px solid var(--ln);padding:0;font-size:16px}
+          #pal button.on{box-shadow:0 0 0 2px var(--cd),0 0 0 4px var(--fg)}
           .b i{font-style:normal;width:20px;text-align:center;line-height:28px;flex:none}
           .b-hr{align-items:center}
           hr{flex:1;border:0;border-top:2px solid var(--mu);opacity:.5;margin:0}
@@ -96,13 +114,14 @@ jobs:
            <button id="add">+</button>
           </div>
           <div class="v" id="E" hidden>
-           <header><button class="ic" id="bk">‹</button><span style="flex:1"></span><button class="ic" id="cp">📋</button><button class="ic" id="pin">📌</button><button class="ic" id="pp">📄</button><button class="ic" id="co">🎨</button><button class="ic" id="del">🗑</button></header>
-           <div id="ed"><input id="ti" placeholder="Judul"><div id="sm"></div><div id="blocks"></div></div>
+           <header><button class="ic" id="bk">‹</button><span style="flex:1"></span><button class="ic" id="lk">🔓</button><button class="ic" id="cp">📋</button><button class="ic" id="pin">📌</button><button class="ic" id="pp">📄</button><button class="ic" id="co">🎨</button><button class="ic" id="del">🗑</button></header>
+           <div id="ed"><input id="ti" placeholder="Judul"><div id="lb">🔒 Terkunci · ketuk baris ceklis untuk ganti status</div><div id="sm"></div><div id="pg"><i></i></div><div id="fl"><button data-f="0">Semua</button><button data-f="1">Belum selesai</button><button data-f="2">Prioritas</button></div><div id="blocks"></div></div>
            <div id="bar">
             <div id="add2"><button data-t="p">Teks</button><button data-t="h">Judul</button><button data-t="c">☑ Ceklis</button><button data-t="b">• Poin</button><button data-t="hr">─ Garis</button><button data-t="k">▥ Kolom</button><button data-t="t">▦ Tabel</button></div>
-            <div id="mv"><button data-m="-1">↑</button><button data-m="1">↓</button><button data-m="0">✕</button></div>
+            <div id="mv"><button id="br">🖌</button><button data-m="-1">↑</button><button data-m="1">↓</button><button data-m="0">✕</button></div>
            </div>
           </div>
+          <div id="pal" hidden></div>
           <div id="to"></div>
           <script>
           const $=s=>document.querySelector(s),B=$('#blocks');
@@ -116,6 +135,7 @@ jobs:
           const COL=['#9aa0a6','#e57373','#f2b84b','#6fbf73','#5aa9e6','#a67fd6'];
           const PP=['pl','ln','gr','dt'],PN=['Polos','Bergaris','Kotak','Titik'];
           const TX=['p','h','c','b'];
+          const TC=['','#e5484d','#f0883e','#d9a400','#30a46c','#3e8ef7','#a06ee1'];let brush=null,flt=0;
           const mk=t=>t=='t'?{t,r:[['','',''],['','','']]}:{t,x:'',y:'',s:0};
           const toast=m=>{const t=$('#to');t.textContent=m;t.classList.add('s');clearTimeout(t.k);t.k=setTimeout(()=>t.classList.remove('s'),1300)};
           const txt=n=>n.title+'\n\n'+n.b.map(b=>b.t=='c'?['[ ] ','[~] ','[x] '][b.s|0]+b.x:b.t=='b'?'• '+b.x:b.t=='h'?'# '+b.x:b.t=='hr'?'────────':b.t=='k'?b.x+' | '+b.y:b.t=='t'?b.r.map(r=>r.join(' | ')).join('\n'):b.x).join('\n');
@@ -148,7 +168,7 @@ jobs:
            else if(b.t=='k')h=x('x',b.x,'Kolom 1')+x('y',b.y,'Kolom 2');
            else if(b.t=='t')h='<div class="tw"><table>'+b.r.map((r,ri)=>'<tr>'+r.map((c,ci)=>`<td><textarea rows="1" data-r="${ri}" data-c="${ci}">${esc(c)}</textarea></td>`).join('')+'</tr>').join('')+'</table></div><div class="tt"><button data-a="ar">+ baris</button><button data-a="ac">+ kolom</button><button data-a="dr">− baris</button><button data-a="dc">− kolom</button></div>';
            else h=x('x',b.x,'Tulis sesuatu...');
-           return `<div class="b b-${b.t}${b.t=='c'?' s'+(b.s|0):''}" data-i="${i}">${h}</div>`;
+           return `<div class="b b-${b.t}${b.t=='c'?' s'+(b.s|0):''}${b.k?' hc':''}" data-i="${i}"${b.k?` style="--bc:${TC[b.k]}"`:''}>${h}</div>`;
           }
           const sz=()=>document.querySelectorAll('#blocks textarea').forEach(t=>{t.style.height='auto';t.style.height=t.scrollHeight+'px'});
           function ed(){
@@ -157,9 +177,12 @@ jobs:
            $('#ti').value=cur.title;
            $('#pin').style.opacity=cur.p?1:.45;
            B.innerHTML=cur.b.map(blk).join('');
-           sz();sum();
+           sz();sum();fl();lock();
           }
-          const sum=()=>{const c=cur.b.filter(b=>b.t=='c'),n=s=>c.filter(b=>(b.s|0)==s).length;$('#sm').textContent=c.length?`☑ ${n(2)} selesai · ◐ ${n(1)} dikerjakan · ☐ ${n(0)} belum`:''};
+          const sum=()=>{const c=cur.b.filter(b=>b.t=='c'),n=s=>c.filter(b=>(b.s|0)==s).length,p=c.filter(b=>b.k&&(b.s|0)<2).length;$('#sm').textContent=c.length?`☑ ${n(2)} selesai · ◐ ${n(1)} dikerjakan · ☐ ${n(0)} belum`+(p?` · ★ ${p} prioritas`:''):'';$('#pg').hidden=$('#fl').hidden=!c.length;$('#pg i').style.width=(c.length?n(2)*100/c.length:0)+'%'};
+          const fl=()=>{B.classList.remove('f1','f2');if(flt)B.classList.add('f'+flt);[...$('#fl').children].forEach((x,i)=>x.classList.toggle('on',i==flt))};
+          const cyc=el=>{const b=cur.b[el.dataset.i];b.s=((b.s|0)+1)%3;el.classList.remove('s0','s1','s2');el.classList.add('s'+b.s);touch();sum();toast(['Belum dikerjakan','Sedang dikerjakan','Selesai'][b.s])};
+          const lock=()=>{$('#E').classList.toggle('lk',!!cur.lk);$('#lk').textContent=cur.lk?'🔒':'🔓';if(cur.lk){brush=null;B.classList.remove('br');$('#pal').hidden=true;$('#br').classList.remove('on');if(document.activeElement)document.activeElement.blur()}};
           const mark=el=>{foc=+el.dataset.i;B.querySelectorAll('.f').forEach(x=>x.classList.remove('f'));el.classList.add('f')};
           function fx(i){const el=B.children[i];if(!el)return;mark(el);const t=el.querySelector('textarea');if(t){t.focus();t.setSelectionRange(t.value.length,t.value.length)}}
           function ins(i,t){cur.b.splice(i,0,mk(t));touch();ed();fx(i)}
@@ -178,9 +201,13 @@ jobs:
           });
           B.addEventListener('focusin',e=>{const el=e.target.closest('.b');if(el)mark(el)});
           B.addEventListener('click',e=>{
-           const el=e.target.closest('.b');if(!el)return;mark(el);
-           if(e.target.closest('.st')){const b=cur.b[el.dataset.i];b.s=((b.s|0)+1)%3;el.classList.remove('s0','s1','s2');el.classList.add('s'+b.s);touch();sum();return toast(['Belum dikerjakan','Sedang dikerjakan','Selesai'][b.s])}
-           const a=e.target.dataset.a;if(!a)return;
+           const el=e.target.closest('.b');if(!el)return;
+           if(cur.lk){if(el.classList.contains('b-c'))cyc(el);return}
+           mark(el);
+           if(e.target.closest('.st'))return cyc(el);
+           const a=e.target.dataset.a,b0=cur.b[el.dataset.i];
+           if(brush!==null&&!a&&'phcbk'.includes(b0.t)){b0.k=brush;el.classList.toggle('hc',!!brush);el.style.setProperty('--bc',TC[brush]||'');touch();return}
+           if(!a)return;
            const r=cur.b[el.dataset.i].r;
            if(a=='ar')r.push(r[0].map(()=>''));
            if(a=='ac')r.forEach(x=>x.push(''));
@@ -202,6 +229,11 @@ jobs:
            touch();ed();fx(foc);
           };
           $('#ti').oninput=e=>{cur.title=e.target.value;touch()};
+          $('#lk').onclick=()=>{cur.lk=!cur.lk;save();lock();toast(cur.lk?'Terkunci: hanya ceklis yang bisa diketuk':'Kunci dibuka')};
+          $('#pal').innerHTML=TC.map((c,i)=>`<button data-p="${i}" style="background:${c||'none'}">${i?'':'✕'}</button>`).join('');
+          $('#fl').onclick=e=>{const f=e.target.dataset.f;if(f===undefined)return;flt=+f;fl()};
+          $('#br').onclick=()=>{const o=$('#pal').hidden;$('#pal').hidden=!o;if(!o){brush=null;B.classList.remove('br');$('#br').classList.remove('on')}else toast('Pilih warna, lalu ketuk baris')};
+          $('#pal').onclick=e=>{const p=e.target.dataset.p;if(p===undefined)return;brush=+p;if(document.activeElement)document.activeElement.blur();B.classList.add('br');$('#br').classList.add('on');[...$('#pal').children].forEach((x,i)=>x.classList.toggle('on',i==brush));toast(brush?'Ketuk baris untuk mewarnai':'Ketuk baris untuk hapus warna')};
           $('#bk').onclick=()=>history.back();
           $('#pin').onclick=()=>{cur.p=!cur.p;touch();ed();toast(cur.p?'Catatan disematkan':'Sematan dilepas')};
           $('#pp').onclick=()=>{const i=(PP.indexOf(cur.pp)+1)%PP.length;cur.pp=PP[i];touch();ed();toast('Kertas: '+PN[i])};
@@ -211,6 +243,7 @@ jobs:
           function route(){
            const m=location.hash.match(/^#n\/(\w+)/);
            cur=m?N.find(n=>n.id==m[1])||null:null;
+           brush=null;B.classList.remove('br');$('#pal').hidden=true;$('#br').classList.remove('on');if(cur)flt=0;
            $('#L').hidden=!!cur;$('#E').hidden=!cur;
            if(cur){ed();foc=-1;if(!cur.title&&cur.b.length==1&&!cur.b[0].x)fx(0)}
            else{N=N.filter(k=>k.title||k.b.some(b=>b.x||b.y||b.t=='hr'||b.t=='t'));save();list()}
