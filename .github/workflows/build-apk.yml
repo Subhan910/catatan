@@ -106,6 +106,14 @@ jobs:
           #bar button{white-space:nowrap;font-size:14px;border:1px solid var(--ln);background:var(--cd)}
           #to{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:#000c;color:#fff;padding:8px 14px;border-radius:20px;font-size:14px;opacity:0;transition:opacity .2s;pointer-events:none}
           #to.s{opacity:1}
+          #rm{position:fixed;inset:0;z-index:50;background:#000b;display:flex;align-items:flex-start;justify-content:center;padding:calc(12px + env(safe-area-inset-top,0px)) 12px 12px}
+          #rm .bx{width:100%;max-width:560px;background:var(--cd);border:1px solid var(--ln);border-radius:16px;padding:12px;display:grid;gap:10px}
+          #rm h2{margin:0;font-size:18px}
+          #rm small{color:var(--mu)}
+          #rm .ac{display:flex;gap:8px}
+          #rm .ac button{flex:1;border:1px solid var(--ln);background:var(--bg);padding:12px 8px;white-space:nowrap}
+          #rm .ac .ok{background:var(--ac);color:var(--cd);border-color:var(--ac);font-weight:700}
+          #rmt{width:100%;height:min(180px,28vh);overflow:auto;resize:none;border:1px solid var(--ln);border-radius:10px;background:var(--bg);color:var(--fg);padding:8px;font:12px/1.35 monospace;line-height:1.35;word-break:break-all}
           </style></head><body>
           <div class="v" id="L">
            <header><h1>Catatan</h1><button class="ic" id="all">📋</button><button class="ic" id="bu">💾</button><button class="ic" id="rs">📥</button><button class="ic" id="th">🌓</button></header>
@@ -122,6 +130,12 @@ jobs:
            </div>
           </div>
           <div id="pal" hidden></div>
+          <div id="rm" hidden><div class="bx">
+           <h2>Pulihkan cadangan</h2>
+           <div class="ac"><button id="rx">Batal</button><button id="rp">📋 Dari clipboard</button><button id="ro" class="ok">OK</button></div>
+           <textarea id="rmt" placeholder="Atau tempel JSON cadangan di sini..." spellcheck="false" autocomplete="off" autocapitalize="off"></textarea>
+           <small>Tombol ada di atas, jadi tetap bisa ditekan walau keyboard terbuka.</small>
+          </div></div>
           <div id="to"></div>
           <script>
           const $=s=>document.querySelector(s),B=$('#blocks');
@@ -144,8 +158,13 @@ jobs:
           dk(ls('th')||(matchMedia('(prefers-color-scheme:dark)').matches?'d':'l'));
           $('#all').onclick=()=>N.length?copy(N.map(txt).join('\n\n=========\n\n'),N.length+' catatan disalin'):toast('Belum ada catatan');
           $('#bu').onclick=()=>copy(JSON.stringify(N),'Cadangan disalin');
-          $('#rs').onclick=()=>{const s=prompt('Tempel cadangan (JSON) di sini:');if(!s)return;
-           try{const a=JSON.parse(s),ids=new Set(N.map(n=>n.id));if(!Array.isArray(a))throw 0;a.forEach(n=>{if(n&&n.id&&Array.isArray(n.b)&&!ids.has(n.id))N.push(n)});save();list();toast('Cadangan dipulihkan')}catch(e){toast('Format tidak valid')}};
+          const rm=$('#rm'),rt=$('#rmt');
+          const rest=s=>{try{const a=JSON.parse(s.trim()),ids=new Set(N.map(n=>n.id));if(!Array.isArray(a))throw 0;let c=0;a.forEach(n=>{if(n&&n.id&&Array.isArray(n.b)&&!ids.has(n.id)){ids.add(n.id);N.push(n);c++}});save();list();toast(c?c+' catatan dipulihkan':'Tidak ada catatan baru');return 1}catch(e){toast('Format tidak valid');return 0}};
+          const rclose=()=>{rt.blur();rt.value='';rm.hidden=true};
+          $('#rs').onclick=()=>{rt.value='';rm.hidden=false};
+          $('#rx').onclick=rclose;
+          $('#ro').onclick=()=>{if(!rt.value.trim())return toast('Kotak masih kosong');if(rest(rt.value))rclose()};
+          $('#rp').onclick=async()=>{try{const s=await navigator.clipboard.readText();if(!s)return toast('Clipboard kosong');if(rest(s))rclose()}catch(e){toast('Clipboard tidak bisa dibaca, tempel manual')}};
           $('#cp').onclick=()=>copy(txt(cur),'Catatan disalin');
           $('#th').onclick=()=>{const t=document.documentElement.dataset.t=='d'?'l':'d';dk(t);ls('th',t)};
 
